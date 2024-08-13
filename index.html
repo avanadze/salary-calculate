@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Employee Salary Calculator</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .container { max-width: 400px; margin: 0 auto; }
+        label, input { display: block; margin-bottom: 10px; }
+        input { width: 100%; padding: 8px; }
+        .result { margin-top: 20px; font-weight: bold; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>Employee Salary Calculator</h2>
+        <label for="hours">Hours Worked:</label>
+        <input type="number" id="hours" placeholder="Enter hours worked">
+
+        <label for="cashSales">Cash Sales:</label>
+        <input type="number" id="cashSales" placeholder="Enter cash sales">
+
+        <label for="cardSales">Card Sales:</label>
+        <input type="number" id="cardSales" placeholder="Enter card sales">
+
+        <label for="tips">Credit Card Tips:</label>
+        <input type="number" id="tips" placeholder="Enter credit card tips">
+
+        <button onclick="calculateSalary()">Calculate</button>
+
+        <div class="result" id="result"></div>
+    </div>
+
+    <script>
+        function calculateSalary() {
+            const hours = parseFloat(document.getElementById('hours').value);
+            const cashSales = parseFloat(document.getElementById('cashSales').value);
+            const cardSales = parseFloat(document.getElementById('cardSales').value);
+            const tips = parseFloat(document.getElementById('tips').value);
+
+            const totalSales = cashSales + cardSales;
+            const commission = totalSales * 0.3;
+            const hourlyPay = hours * 15;
+            const salary = Math.max(commission, hourlyPay) + tips;
+
+            let cashPayout = Math.min(cashSales, salary);
+            let cashInEnvelope = cashSales > salary ? cashSales - salary : 0;
+            let debtLeft = salary > cashSales ? salary - cashSales : 0;
+
+            document.getElementById('result').innerHTML = `
+                Final Salary: $${salary.toFixed(2)}<br>
+                Cash Payout: $${cashPayout.toFixed(2)}<br>
+                Cash in Envelope: $${cashInEnvelope.toFixed(2)}<br>
+                Debt Left: $${debtLeft.toFixed(2)}
+            `;
+        }
+    </script>
+</body>
+</html>
