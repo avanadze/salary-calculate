@@ -15,8 +15,12 @@
 <body>
     <div class="container">
         <h2>Employee Salary Calculator</h2>
-        <label for="hours">Hours Worked:</label>
-        <input type="number" id="hours" placeholder="Enter hours worked">
+        
+        <label for="timeIn">Time In:</label>
+        <input type="text" id="timeIn" placeholder="Enter time in (e.g., 1:00pm or 13:00)">
+
+        <label for="timeOut">Time Out:</label>
+        <input type="text" id="timeOut" placeholder="Enter time out (e.g., 9:00pm or 21:00)">
 
         <label for="cashSales">Cash Sales:</label>
         <input type="number" id="cashSales" placeholder="Enter cash sales">
@@ -30,30 +34,55 @@
         <button onclick="calculateSalary()">Calculate</button>
 
         <div class="result" id="result"></div>
+        <div class="message" id="message"></div>
     </div>
 
     <script>
+        function parseTime(input) {
+            // Convert input to a Date object for calculation
+            let [time, modifier] = input.split(/(?<=\d)(?=\D)/); // Split into time and AM/PM if applicable
+            let [hours, minutes] = time.split(':').map(Number);
+            if (modifier && modifier.toLowerCase().includes('pm') && hours < 12) hours += 12;
+            if (modifier && modifier.toLowerCase().includes('am') && hours === 12) hours = 0;
+            return new Date(0, 0, 0, hours, minutes || 0);
+        }
+
         function calculateSalary() {
-            const hours = parseFloat(document.getElementById('hours').value);
+            const timeIn = document.getElementById('timeIn').value;
+            const timeOut = document.getElementById('timeOut').value;
             const cashSales = parseFloat(document.getElementById('cashSales').value);
             const cardSales = parseFloat(document.getElementById('cardSales').value);
             const tips = parseFloat(document.getElementById('tips').value);
 
+            // Calculate Hours Worked
+            const startTime = parseTime(timeIn);
+            const endTime = parseTime(timeOut);
+            const hoursWorked = (endTime - startTime) / (1000 * 60 * 60); // Convert milliseconds to hours
+
             const totalSales = cashSales + cardSales;
             const commission = totalSales * 0.3;
-            const hourlyPay = hours * 15;
+            const hourlyPay = hoursWorked * 15;
             const salary = Math.max(commission, hourlyPay) + tips;
 
             let cashPayout = Math.min(cashSales, salary);
             let cashInEnvelope = cashSales > salary ? cashSales - salary : 0;
             let debtLeft = salary > cashSales ? salary - cashSales : 0;
+            let dueToday = cashPayout; // Due Today is the amount they take home
+
+            let message = "";
+            if (totalSales > 500) {
+                message = "Thank you for your hard work!";
+            } else {
+                message = "Good job! Let's aim for even better results next time!";
+            }
 
             document.getElementById('result').innerHTML = `
-                Final Salary: $${salary.toFixed(2)}<br>
-                Cash Payout: $${cashPayout.toFixed(2)}<br>
+                Hours Worked: ${hoursWorked.toFixed(2)} hours<br>
+                Due Today: $${dueToday.toFixed(2)}<br>
                 Cash in Envelope: $${cashInEnvelope.toFixed(2)}<br>
                 Debt Left: $${debtLeft.toFixed(2)}
             `;
+            document.getElementById('message').innerHTML = message;
         }
     </script>
 </body>
